@@ -47,10 +47,13 @@
     padding:26px 20px 56px;
     min-height:100vh;
     display:flex;flex-direction:column;
+    justify-content:flex-start;
   }
+  #app.centered{justify-content:center}
 
   /* 상단 진행 (카드 밖, 배경 위) */
-  .topbar{flex:0 0 auto;padding:0 4px 16px}
+  .topbar{flex:0 0 auto;padding:0 4px 16px;display:none}
+  .topbar.show{display:block}
   .bar{height:4px;background:rgba(255,255,255,.6);border-radius:99px;overflow:hidden}
   .bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky-5),var(--sky-6));border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
   .counter{margin-top:9px;font-size:12px;letter-spacing:.13em;color:var(--ink-soft);font-weight:600;font-variant-numeric:tabular-nums}
@@ -58,18 +61,17 @@
   /* 화면 = 카드. 내용 크기만큼만 커져서 정사각형에 가깝게 보인다 */
   .screen{display:none;flex-direction:column;
           background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
-          padding:36px 30px}
+          padding:42px 34px}
   .screen.on{display:flex;animation:rise .5s cubic-bezier(.2,.8,.2,1)}
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   .center{text-align:center;align-items:center}
-  /* 인트로류 화면은 남은 세로 공간 가운데로 */
-  .screen.center{margin:auto 0}
+  .screen.center{min-height:320px;justify-content:center}
 
   .eyebrow{font-size:12.5px;letter-spacing:.26em;color:var(--sky-6);font-weight:700;margin-bottom:18px}
   h1{font-family:'Gowun Batang',serif;font-size:clamp(30px,8vw,40px);line-height:1.3;font-weight:700;color:var(--ink);letter-spacing:-.01em}
   h1.eventtitle{font-family:'Gowun Batang',Georgia,serif;font-style:italic;font-size:clamp(26px,7.4vw,34px);letter-spacing:.01em}
   h2{font-family:'Gowun Batang',serif;font-size:clamp(25px,7vw,31px);line-height:1.42;font-weight:700;color:var(--ink);margin-bottom:20px;word-break:keep-all}
-  p{font-size:15.5px;line-height:1.78;color:var(--ink-soft);font-weight:400}
+  p{font-size:15.5px;line-height:1.78;color:var(--ink-soft);font-weight:400;word-break:keep-all;overflow-wrap:break-word}
   p+p{margin-top:14px}
   .lead{font-size:16.5px;color:var(--ink)}
 
@@ -163,9 +165,9 @@
   <!-- 2. 소개 -->
   <section class="screen center" id="s-intro">
     <div class="eyebrow">이 검사에 대하여</div>
-    <h2>가까워지고 싶은 마음, 물러서고 싶은 마음</h2>
-    <p class="lead">누구에게나 두 마음이 함께 있습니다. 어떤 날은 더 붙어 있고 싶고, 어떤 날은 혼자이고 싶습니다.</p>
-    <p>이 검사는 그 두 마음이 나에게 어떤 비율로 섞여 있는지를 72개의 문장으로 살펴봅니다. 옳고 그른 답은 없습니다.</p>
+    <h2>가까움과 거리 사이</h2>
+    <p class="lead">누구에게나 두 마음이 함께 있습니다.<br>누군가와 같이 있고 싶은 날, 혼자이고 싶은 날.</p>
+    <p>이 검사는 그 비율을 72개의 문장으로 살펴봅니다. 정답은 없습니다.</p>
     <p>약 10분이 걸립니다.</p>
     <div class="foot">
       <button class="btn" onclick="go('s-info')">계속</button>
@@ -242,10 +244,10 @@
 
   <!-- 7. 완료 -->
   <section class="screen center" id="s-done">
-    <div style="font-size:44px;margin-bottom:20px">🌊</div>
+    <img src="chombi.png" alt="첨벙이" style="width:132px;height:auto;margin-bottom:18px">
     <h1 style="font-size:32px">고맙습니다.</h1>
-    <p style="margin-top:20px">72개의 문장에 답해 주셨습니다.<br>결과지는 정리되는 대로 보내드립니다.</p>
-    <p style="font-size:13.5px;opacity:.7;margin-top:22px">마음이 무거운 이야기가 떠올랐다면,<br>현장에 있는 사람에게 편하게 말을 걸어 주세요.</p>
+    <p style="margin-top:20px">72개의 문장에 답해 주셨습니다.</p>
+    <p style="margin-top:18px">입력해 주신 내용을 바탕으로 추후 '나만의 리포트'를 받아보실 수 있습니다. 남은 시간 동안 다른 부스들도 편안하게 둘러보세요!</p>
   </section>
 
   <!-- 오류 -->
@@ -270,10 +272,12 @@ const state = { info:{age:"",sex:""}, answers:new Array(72).fill(null), i:0 };
 
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
+  const target = document.getElementById(id);
+  target.classList.add('on');
   window.scrollTo({top:0, behavior:'instant'});
   const quiz = id === 's-quiz';
-  document.querySelector('.topbar').style.visibility = quiz ? 'visible':'hidden';
+  document.querySelector('.topbar').classList.toggle('show', quiz);
+  document.getElementById('app').classList.toggle('centered', target.classList.contains('center'));
 }
 
 /* 칩 선택 */
