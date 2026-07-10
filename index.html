@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>마음의 거리 — 첨벙청년 마음 팝업</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-1:#eaf6ff;
+    --sky-2:#d3ecff;
+    --sky-3:#a9d9fb;
+    --sky-4:#6fbef2;
+    --sky-5:#3a9fe6;
+    --sky-6:#1f7cc4;
+    --ink:#123047;
+    --ink-soft:#4a6a80;
+    --card:#ffffff;
+    --ok:#1f9d78;
+    --shadow:0 10px 30px rgba(31,124,196,.14);
+    --shadow-sm:0 4px 14px rgba(31,124,196,.10);
+    --r:22px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;
+    color:var(--ink);
+    background:linear-gradient(180deg,var(--sky-1) 0%,var(--sky-2) 45%,var(--sky-3) 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    min-height:100%;
+    line-height:1.6;
+  }
+  /* 잔물결 장식 */
+  body::before{
+    content:"";position:fixed;left:0;right:0;bottom:0;height:34vh;z-index:0;pointer-events:none;
+    background:radial-gradient(120% 80% at 50% 120%, rgba(58,159,230,.20), transparent 60%);
+  }
+
+  /* 페이지: 가운데 정렬된 640px 폭 안에서 카드가 내용만큼만 커진다 */
+  #app{
+    position:relative;z-index:1;
+    max-width:640px;margin:0 auto;
+    padding:26px 20px 56px;
+    min-height:100vh;
+    display:flex;flex-direction:column;
+  }
+
+  /* 상단 진행 (카드 밖, 배경 위) */
+  .topbar{flex:0 0 auto;padding:0 4px 16px}
+  .bar{height:4px;background:rgba(255,255,255,.6);border-radius:99px;overflow:hidden}
+  .bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky-5),var(--sky-6));border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+  .counter{margin-top:9px;font-size:12px;letter-spacing:.13em;color:var(--ink-soft);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* 화면 = 카드. 내용 크기만큼만 커져서 정사각형에 가깝게 보인다 */
+  .screen{display:none;flex-direction:column;
+          background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
+          padding:36px 30px}
+  .screen.on{display:flex;animation:rise .5s cubic-bezier(.2,.8,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .center{text-align:center;align-items:center}
+  /* 인트로류 화면은 남은 세로 공간 가운데로 */
+  .screen.center{margin:auto 0}
+
+  .eyebrow{font-size:12.5px;letter-spacing:.26em;color:var(--sky-6);font-weight:700;margin-bottom:18px}
+  h1{font-family:'Gowun Batang',serif;font-size:clamp(30px,8vw,40px);line-height:1.3;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+  h1.eventtitle{font-family:'Gowun Batang',Georgia,serif;font-style:italic;font-size:clamp(26px,7.4vw,34px);letter-spacing:.01em}
+  h2{font-family:'Gowun Batang',serif;font-size:clamp(25px,7vw,31px);line-height:1.42;font-weight:700;color:var(--ink);margin-bottom:20px;word-break:keep-all}
+  p{font-size:15.5px;line-height:1.78;color:var(--ink-soft);font-weight:400}
+  p+p{margin-top:14px}
+  .lead{font-size:16.5px;color:var(--ink)}
+
+  /* 버튼 */
+  .btn{
+    width:100%;padding:18px;border:none;border-radius:16px;
+    background:var(--sky-6);color:#fff;font-size:17px;font-weight:600;font-family:inherit;
+    cursor:pointer;transition:transform .18s,box-shadow .18s,opacity .18s;
+    box-shadow:0 10px 22px rgba(31,124,196,.28);
+  }
+  .btn:active{transform:scale(.975)}
+  .btn:disabled{opacity:.32;box-shadow:none;cursor:not-allowed}
+  .foot{margin-top:28px;flex:0 0 auto}
+
+  /* 작은 텍스트 링크형 뒤로가기 */
+  .textlink{
+    display:inline-block;background:none;border:none;box-shadow:none;
+    color:var(--ink-soft);font-family:inherit;font-size:14px;font-weight:500;
+    padding:10px 6px;margin-top:6px;cursor:pointer;opacity:.85;
+  }
+  .textlink:active{opacity:.5}
+
+  /* 폼 */
+  .field{margin-bottom:20px;text-align:left}
+  .field label{display:block;font-size:13.5px;font-weight:600;color:var(--ink-soft);margin-bottom:9px;letter-spacing:.02em}
+  .field input{
+    width:100%;padding:16px;border:1.5px solid var(--sky-2);border-radius:13px;
+    font-size:16.5px;font-family:inherit;background:#fff;color:var(--ink);transition:border-color .2s;
+  }
+  .field input:focus{outline:none;border-color:var(--sky-4)}
+  .field input::placeholder{color:#B7D6EA}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    flex:1 1 auto;min-width:72px;padding:14px 8px;border:1.5px solid var(--sky-2);border-radius:13px;
+    background:#fff;font-size:15.5px;font-family:inherit;color:var(--ink-soft);font-weight:500;
+    cursor:pointer;transition:.2s;
+  }
+  .chip[aria-pressed="true"]{background:var(--sky-6);border-color:var(--sky-6);color:#fff;font-weight:600}
+  .hint{font-size:13px;color:var(--ink-soft);opacity:.85;margin-top:9px;line-height:1.6}
+  .err{color:#C4553F;font-size:14px;margin-top:14px;min-height:18px;font-weight:500}
+
+  /* 안내 카드 (카드 안의 서브 카드) */
+  .guide{background:var(--sky-1);border-radius:16px;padding:22px;text-align:left;margin-top:8px}
+  .guide .row{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--sky-2)}
+  .guide .row:last-child{border:none;padding-bottom:0}
+  .guide .row:first-child{padding-top:0}
+  .num{flex:0 0 26px;height:26px;border-radius:50%;background:#fff;color:var(--sky-6);
+       font-size:13px;font-weight:700;display:grid;place-items:center;margin-top:2px}
+  .guide .row p{font-size:15.5px;line-height:1.75;margin:0;color:var(--ink)}
+
+  /* 문항 */
+  .qtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .qnum{font-size:12px;letter-spacing:.22em;color:var(--sky-4);font-weight:700}
+  .qtext{
+    font-family:'Gowun Batang',serif;font-size:clamp(22px,6vw,27px);line-height:1.6;
+    font-weight:700;color:var(--ink);margin-bottom:30px;word-break:keep-all;letter-spacing:-.01em;
+  }
+  .scale{display:flex;flex-direction:column;gap:9px}
+  .opt{
+    display:flex;align-items:center;gap:14px;width:100%;
+    padding:16px;border:1.5px solid var(--sky-2);border-radius:14px;background:#fff;
+    font-size:16.5px;font-family:inherit;color:var(--ink);font-weight:400;cursor:pointer;
+    transition:border-color .16s,background .16s,transform .12s;text-align:left;
+  }
+  .opt:active{transform:scale(.985)}
+  .opt[aria-pressed="true"]{border-color:var(--sky-6);background:var(--sky-6);color:#fff;font-weight:600}
+  .dot{flex:0 0 9px;height:9px;border-radius:50%;background:var(--sky-3);transition:.16s}
+  .opt[aria-pressed="true"] .dot{background:#fff;transform:scale(1.25)}
+
+  /* 로딩/완료 */
+  .spinner{width:36px;height:36px;border:3px solid var(--sky-2);border-top-color:var(--sky-6);
+           border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 22px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="topbar"><div class="bar"><span id="prog"></span></div><div class="counter" id="cnt"></div></div>
+
+  <!-- 1. 인사 -->
+  <section class="screen center on" id="s-hello">
+    <div class="eyebrow">첨벙청년</div>
+    <h1 class="eventtitle">Mood, Volume, Summer</h1>
+    <p style="margin-top:22px">잠시 앉아서, 사람들과 나 사이의<br>거리를 함께 들여다봅니다.</p>
+    <div class="foot"><button class="btn" onclick="go('s-intro')">시작하기</button></div>
+  </section>
+
+  <!-- 2. 소개 -->
+  <section class="screen center" id="s-intro">
+    <div class="eyebrow">이 검사에 대하여</div>
+    <h2>가까워지고 싶은 마음, 물러서고 싶은 마음</h2>
+    <p class="lead">누구에게나 두 마음이 함께 있습니다. 어떤 날은 더 붙어 있고 싶고, 어떤 날은 혼자이고 싶습니다.</p>
+    <p>이 검사는 그 두 마음이 나에게 어떤 비율로 섞여 있는지를 72개의 문장으로 살펴봅니다. 옳고 그른 답은 없습니다.</p>
+    <p>약 10분이 걸립니다.</p>
+    <div class="foot">
+      <button class="btn" onclick="go('s-info')">계속</button>
+      <button class="textlink" onclick="go('s-hello')">← 뒤로</button>
+    </div>
+  </section>
+
+  <!-- 3. 정보 -->
+  <section class="screen" id="s-info">
+    <div style="padding-top:14px">
+      <div class="eyebrow">기본 정보</div>
+      <h2 style="margin-bottom:8px">먼저, 당신을 알려주세요</h2>
+      <p style="font-size:14.5px;margin-bottom:26px;opacity:.75">결과지를 보내드리기 위해 필요합니다.</p>
+    </div>
+    <div class="field"><label for="f-name">이름</label>
+      <input id="f-name" type="text" placeholder="홍길동" autocomplete="name"></div>
+    <div class="field"><label for="f-phone">연락처</label>
+      <input id="f-phone" type="tel" inputmode="numeric" placeholder="010-0000-0000" autocomplete="tel"></div>
+    <div class="field"><label>연령대</label>
+      <div class="chips" id="f-age">
+        <button class="chip" data-v="10대" aria-pressed="false">10대</button>
+        <button class="chip" data-v="20대" aria-pressed="false">20대</button>
+        <button class="chip" data-v="30대" aria-pressed="false">30대</button>
+      </div>
+      <div class="hint">이 검사는 30대까지를 대상으로 합니다.</div>
+    </div>
+    <div class="field"><label>성별</label>
+      <div class="chips" id="f-sex">
+        <button class="chip" data-v="여성" aria-pressed="false">여성</button>
+        <button class="chip" data-v="남성" aria-pressed="false">남성</button>
+        <button class="chip" data-v="선택 안 함" aria-pressed="false">선택 안 함</button>
+      </div>
+    </div>
+    <div class="err" id="e-info"></div>
+    <div class="foot">
+      <button class="btn" onclick="submitInfo()">계속</button>
+      <button class="textlink" onclick="go('s-intro')">← 뒤로</button>
+    </div>
+  </section>
+
+  <!-- 4. 응답 방법 -->
+  <section class="screen" id="s-howto">
+    <div style="padding-top:14px">
+      <div class="eyebrow">응답 방법</div>
+      <h2>답하기 전에 세 가지만</h2>
+    </div>
+    <div class="guide">
+      <div class="row"><div class="num">1</div><p><b>한 화면에 한 문장</b>씩 나옵니다. 문장을 읽고 지금의 나에게 가장 가까운 쪽을 고르면 다음으로 넘어갑니다.</p></div>
+      <div class="row"><div class="num">2</div><p><b>가까운 사람</b>을 떠올려 주세요. 연인, 친구, 가족 누구여도 좋습니다. 지금 없다면 예전에 가까웠던 사람이어도 됩니다.</p></div>
+      <div class="row"><div class="num">3</div><p><b>오래 고민하지 마세요.</b> 처음 떠오른 답이 가장 정확합니다. 되돌아가고 싶으면 뒤로 버튼을 누르면 됩니다.</p></div>
+    </div>
+    <div class="foot">
+      <button class="btn" onclick="startQuiz()">검사 시작</button>
+      <button class="textlink" onclick="go('s-info')">← 뒤로</button>
+    </div>
+  </section>
+
+  <!-- 5. 문항 -->
+  <section class="screen" id="s-quiz">
+    <div class="qtop">
+      <div class="qnum" id="q-num"></div>
+      <button class="textlink" style="margin:0;padding:4px 2px" onclick="prevQ()" id="btn-back">← 뒤로</button>
+    </div>
+    <div class="qtext" id="q-text"></div>
+    <div class="scale" id="q-scale"></div>
+  </section>
+
+  <!-- 6. 전송 -->
+  <section class="screen center" id="s-send">
+    <div class="spinner"></div>
+    <h2 style="margin-bottom:10px">결과를 정리하고 있습니다</h2>
+    <p>잠시만 기다려 주세요.</p>
+  </section>
+
+  <!-- 7. 완료 -->
+  <section class="screen center" id="s-done">
+    <div style="font-size:44px;margin-bottom:20px">🌊</div>
+    <h1 style="font-size:32px">고맙습니다.</h1>
+    <p style="margin-top:20px">72개의 문장에 답해 주셨습니다.<br>결과지는 정리되는 대로 보내드립니다.</p>
+    <p style="font-size:13.5px;opacity:.7;margin-top:22px">마음이 무거운 이야기가 떠올랐다면,<br>현장에 있는 사람에게 편하게 말을 걸어 주세요.</p>
+  </section>
+
+  <!-- 오류 -->
+  <section class="screen center" id="s-fail">
+    <h2>전송하지 못했습니다</h2>
+    <p>네트워크를 확인하고 다시 시도해 주세요.<br>응답은 그대로 남아 있습니다.</p>
+    <div class="foot"><button class="btn" onclick="sendData()">다시 보내기</button></div>
+  </section>
+</div>
+
+<script>
+/* ====== 설정: 배포한 Apps Script 웹앱 URL을 넣으세요 ====== */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwJypMtxUlfOCHveoiIGV6SxqIToE84pxDE6LrAkqtpwAuPS6CFy5H3mr3p3kFxkeGe/exec";
+
+const ITEMS = [{"n":69,"code":"B3-09","sub":"정서억제","rev":false,"text":"나는 화가 나도 그 자리에서 말하지 않는다."},{"n":34,"code":"A3-10","sub":"관계반추","rev":false,"text":"나는 관계에 대해 필요 이상으로 오래 생각한다."},{"n":9,"code":"A1-09","sub":"유기불안","rev":false,"text":"나는 내가 실수하면 상대가 나를 떠날 것 같다고 느낀다."},{"n":41,"code":"B1-05","sub":"친밀감불편","rev":false,"text":"나는 상대방이 나에게 지나치게 다가온다고 느끼면, 나도 모르게 마음의 벽을 친다."},{"n":21,"code":"A2-09","sub":"인정욕구","rev":true,"text":"나는 다른 사람이 어떻게 보든 나 자신을 괜찮게 여긴다."},{"n":52,"code":"B2-04","sub":"자기의존","rev":false,"text":"나는 누군가에게 의존하면 결국 실망하게 된다고 생각한다."},{"n":16,"code":"A2-04","sub":"인정욕구","rev":false,"text":"나는 거절당할까 봐 하고 싶은 말을 하지 못한다."},{"n":56,"code":"B2-08","sub":"자기의존","rev":false,"text":"나는 사람들과의 관계가 시간을 많이 빼앗는다고 느낀다."},{"n":29,"code":"A3-05","sub":"관계반추","rev":false,"text":"나는 상대가 나를 어떻게 생각할지 계속 생각한다."},{"n":19,"code":"A2-07","sub":"인정욕구","rev":false,"text":"나는 다른 사람에게 미움받는 것을 견디기 어렵다."},{"n":71,"code":"B3-11","sub":"정서억제","rev":false,"text":"나는 속마음을 말하고 나면 후회한다."},{"n":31,"code":"A3-07","sub":"관계반추","rev":false,"text":"나는 이미 멀어진 사람을 오랫동안 마음에서 놓지 못한다."},{"n":13,"code":"A2-01","sub":"인정욕구","rev":false,"text":"나는 다른 사람의 인정을 받아야 내가 괜찮은 사람이라고 느낀다."},{"n":51,"code":"B2-03","sub":"자기의존","rev":false,"text":"나는 사람들과 가까워지는 것보다 혼자 하는 일에 시간을 쓰는 것이 더 편하다."},{"n":22,"code":"A2-10","sub":"인정욕구","rev":false,"text":"나는 누군가에게 필요한 사람이어야 마음이 편하다."},{"n":5,"code":"A1-05","sub":"유기불안","rev":false,"text":"나는 누군가와 가까워질수록 그 사람을 잃을까 봐 두려워진다."},{"n":45,"code":"B1-09","sub":"친밀감불편","rev":false,"text":"나는 다정한 표현을 주고받는 것이 어색하다."},{"n":4,"code":"A1-04","sub":"유기불안","rev":false,"text":"나는 내가 주는 만큼 상대가 나를 아껴주지 않는다고 느낀다."},{"n":54,"code":"B2-06","sub":"자기의존","rev":true,"text":"나는 힘들 때 주변 사람에게 자연스럽게 기댄다."},{"n":64,"code":"B3-04","sub":"정서억제","rev":false,"text":"나는 다른 사람에게 감정을 이야기하면 상황이 더 복잡해진다고 생각한다."},{"n":1,"code":"A1-01","sub":"유기불안","rev":false,"text":"나는 가까운 사람이 나를 떠날까 봐 걱정된다."},{"n":53,"code":"B2-05","sub":"자기의존","rev":false,"text":"나는 내 문제를 다른 사람과 이야기하지 않는다."},{"n":18,"code":"A2-06","sub":"인정욕구","rev":false,"text":"나는 상대의 기분을 맞추다가 내가 원하는 것을 놓치곤 한다."},{"n":48,"code":"B1-12","sub":"친밀감불편","rev":false,"text":"나는 누군가와 가까워질수록 답답함을 느낀다."},{"n":62,"code":"B3-02","sub":"정서억제","rev":false,"text":"나는 힘들다는 말을 입 밖으로 꺼내기 어렵다."},{"n":28,"code":"A3-04","sub":"관계반추","rev":false,"text":"나는 관계 생각 때문에 해야 할 일에 집중하지 못한다."},{"n":14,"code":"A2-02","sub":"인정욕구","rev":false,"text":"나는 누군가 나를 못마땅해하면 오래 신경 쓴다."},{"n":68,"code":"B3-08","sub":"정서억제","rev":false,"text":"나는 내 감정을 드러내면 상대가 부담스러워할까 봐 걱정된다."},{"n":15,"code":"A2-03","sub":"인정욕구","rev":false,"text":"나는 사람들에게 좋은 인상을 남기려고 애쓴다."},{"n":25,"code":"A3-01","sub":"관계반추","rev":false,"text":"나는 사람들과 있었던 일을 여러 번 다시 떠올린다."},{"n":47,"code":"B1-11","sub":"친밀감불편","rev":false,"text":"나는 누군가 내 사생활에 들어오는 것이 싫다."},{"n":17,"code":"A2-05","sub":"인정욕구","rev":false,"text":"나는 남들의 평가에 따라 나에 대한 생각이 달라진다."},{"n":40,"code":"B1-04","sub":"친밀감불편","rev":false,"text":"나는 누군가 나를 너무 잘 알게 되는 것이 꺼려진다."},{"n":63,"code":"B3-03","sub":"정서억제","rev":false,"text":"나는 내 약한 모습을 보이는 것이 싫다."},{"n":32,"code":"A3-08","sub":"관계반추","rev":true,"text":"나는 관계에서 있었던 일을 시간이 지나면 자연스럽게 잊는다."},{"n":24,"code":"A2-12","sub":"인정욕구","rev":false,"text":"나는 사람들의 반응이 없으면 내가 잘하고 있는지 알기 어렵다."},{"n":67,"code":"B3-07","sub":"정서억제","rev":false,"text":"나는 내 속마음을 아는 사람이 생기면, 언젠가 이용당할 것 같아 불안하다."},{"n":59,"code":"B2-11","sub":"자기의존","rev":false,"text":"나는 누군가에게 조언을 구하는 것이 나약해 보인다고 생각한다."},{"n":3,"code":"A1-03","sub":"유기불안","rev":false,"text":"나는 가까운 사람이 평소와 다르게 행동하면 관계가 끝나가는 신호로 느낀다."},{"n":50,"code":"B2-02","sub":"자기의존","rev":false,"text":"나는 다른 사람에게 도움을 요청하기 어렵다."},{"n":7,"code":"A1-07","sub":"유기불안","rev":false,"text":"나는 상대의 연락이 뜸해지면 나를 밀어낸다고 느낀다."},{"n":55,"code":"B2-07","sub":"자기의존","rev":false,"text":"나는 다른 사람에게 기대고 나면 오히려 더 불안해진다."},{"n":46,"code":"B1-10","sub":"친밀감불편","rev":false,"text":"나는 사람들이 나에게 진심으로 대한다고 믿기 어렵다."},{"n":27,"code":"A3-03","sub":"관계반추","rev":false,"text":"나는 관계의 작은 변화도 금방 알아차린다."},{"n":39,"code":"B1-03","sub":"친밀감불편","rev":false,"text":"나는 관계에서 일정한 거리를 유지하려 한다."},{"n":26,"code":"A3-02","sub":"관계반추","rev":false,"text":"나는 상대의 말 한마디를 여러 의미로 곱씹는다."},{"n":57,"code":"B2-09","sub":"자기의존","rev":false,"text":"나는 남에게 신세 지는 것이 마음에 걸린다."},{"n":12,"code":"A1-12","sub":"유기불안","rev":false,"text":"나는 상대가 나보다 다른 사람을 더 좋아하게 될까 봐 신경 쓰인다."},{"n":42,"code":"B1-06","sub":"친밀감불편","rev":false,"text":"나는 나에게 기대는 사람이 있으면 부담을 느낀다."},{"n":11,"code":"A1-11","sub":"유기불안","rev":true,"text":"나는 가까운 관계가 쉽게 흔들리지 않으리라고 믿는다."},{"n":35,"code":"A3-11","sub":"관계반추","rev":false,"text":"나는 상대의 반응이 늦으면 최악의 경우를 먼저 떠올린다."},{"n":61,"code":"B3-01","sub":"정서억제","rev":false,"text":"나는 감정을 겉으로 잘 드러내지 않는다."},{"n":8,"code":"A1-08","sub":"유기불안","rev":false,"text":"나는 관계가 안정적일 때조차 언제 무너질지 모른다고 생각한다."},{"n":33,"code":"A3-09","sub":"관계반추","rev":false,"text":"나는 상대가 말하지 않은 속마음까지 알아내려 한다."},{"n":38,"code":"B1-02","sub":"친밀감불편","rev":false,"text":"나는 정서적으로 깊은 대화가 불편하다."},{"n":2,"code":"A1-02","sub":"유기불안","rev":false,"text":"나는 내가 아끼는 사람이 나를 덜 좋아하게 될까 봐 걱정된다."},{"n":72,"code":"B3-12","sub":"정서억제","rev":false,"text":"나는 내 기분이나 감정을 드러내지 않으려고 일부러 대화 주제를 사실 관계로만 돌리는 편이다."},{"n":10,"code":"A1-10","sub":"유기불안","rev":false,"text":"나는 가까운 사람의 마음을 확인하지 못하면 안심이 되지 않는다."},{"n":65,"code":"B3-05","sub":"정서억제","rev":true,"text":"나는 내 감정을 가까운 사람에게 솔직하게 말한다."},{"n":6,"code":"A1-06","sub":"유기불안","rev":false,"text":"나는 혼자 남겨지는 상황을 자주 상상한다."},{"n":23,"code":"A2-11","sub":"인정욕구","rev":false,"text":"나는 갈등이 생기면 내 잘못이 아니어도 먼저 사과한다."},{"n":66,"code":"B3-06","sub":"정서억제","rev":false,"text":"나는 사람들 앞에서 아무렇지 않은 척한다."},{"n":49,"code":"B2-01","sub":"자기의존","rev":false,"text":"나는 힘든 일이 생기면 다른 사람에게 기대기보다 혼자 견디는 쪽을 택한다."},{"n":20,"code":"A2-08","sub":"인정욕구","rev":false,"text":"나는 사람들이 나를 실제보다 얕볼까 봐 걱정한다."},{"n":37,"code":"B1-01","sub":"친밀감불편","rev":false,"text":"나는 누군가 너무 가까이 다가오면 부담스럽다."},{"n":58,"code":"B2-10","sub":"자기의존","rev":false,"text":"나는 다른 사람에게 부탁하느니 내가 조금 더 힘든 게 낫다고 생각한다."},{"n":36,"code":"A3-12","sub":"관계반추","rev":false,"text":"나는 상대에게 서운했던 일을 오래 기억한다."},{"n":43,"code":"B1-07","sub":"친밀감불편","rev":true,"text":"나는 가까운 사람과 마음을 나누는 일이 편안하다."},{"n":60,"code":"B2-12","sub":"자기의존","rev":false,"text":"나는 누군가에게 의지하는 내 모습이 마음에 들지 않는다."},{"n":30,"code":"A3-06","sub":"관계반추","rev":false,"text":"나는 관계가 잘 풀릴 때도 무언가 문제가 있는지 살핀다."},{"n":44,"code":"B1-08","sub":"친밀감불편","rev":false,"text":"나는 관계가 깊어지려 하면, 이유 없이 거리를 둔다."},{"n":70,"code":"B3-10","sub":"정서억제","rev":false,"text":"나는 위로를 받는 상황이 어색하다."}];
+
+const LABELS = [
+  "전혀 아니다","아니다","약간 아니다","약간 그렇다","그렇다","매우 그렇다"
+];
+
+const state = { info:{age:"",sex:""}, answers:new Array(72).fill(null), i:0 };
+
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0, behavior:'instant'});
+  const quiz = id === 's-quiz';
+  document.querySelector('.topbar').style.visibility = quiz ? 'visible':'hidden';
+}
+
+/* 칩 선택 */
+document.querySelectorAll('.chips').forEach(group=>{
+  group.addEventListener('click', e=>{
+    const chip = e.target.closest('.chip'); if(!chip) return;
+    group.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','false'));
+    chip.setAttribute('aria-pressed','true');
+    state.info[group.id === 'f-age' ? 'age' : 'sex'] = chip.dataset.v;
+  });
+});
+
+/* 연락처 자동 하이픈 */
+document.getElementById('f-phone').addEventListener('input', e=>{
+  let v = e.target.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>7) v = v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7);
+  else if(v.length>3) v = v.slice(0,3)+'-'+v.slice(3);
+  e.target.value = v;
+});
+
+function submitInfo(){
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const err = document.getElementById('e-info');
+  if(!name){ err.textContent='이름을 입력해 주세요.'; return; }
+  if(!/^01\d-\d{3,4}-\d{4}$/.test(phone)){ err.textContent='연락처를 정확히 입력해 주세요.'; return; }
+  if(!state.info.age){ err.textContent='연령대를 골라 주세요.'; return; }
+  if(!state.info.sex){ err.textContent='성별을 골라 주세요.'; return; }
+  err.textContent='';
+  state.info.name = name; state.info.phone = phone;
+  go('s-howto');
+}
+
+function startQuiz(){ state.i = 0; renderQ(); go('s-quiz'); }
+
+function renderQ(){
+  const it = ITEMS[state.i];
+  document.getElementById('q-num').textContent = String(state.i+1).padStart(2,'0') + ' / 72';
+  document.getElementById('q-text').textContent = it.text;
+  document.getElementById('prog').style.width = ((state.i)/72*100)+'%';
+  document.getElementById('cnt').textContent = `${state.i+1} of 72`;
+  document.getElementById('btn-back').style.visibility = state.i===0 ? 'hidden':'visible';
+
+  const wrap = document.getElementById('q-scale');
+  wrap.innerHTML = '';
+  LABELS.forEach((lab,k)=>{
+    const b = document.createElement('button');
+    b.className='opt'; b.type='button';
+    b.setAttribute('aria-pressed', state.answers[state.i]===k+1 ? 'true':'false');
+    b.innerHTML = `<span class="dot"></span><span>${lab}</span>`;
+    b.onclick = ()=>choose(k+1);
+    wrap.appendChild(b);
+  });
+}
+
+function choose(v){
+  state.answers[state.i] = v;
+  renderQ();
+  setTimeout(()=>{
+    if(state.i < 71){ state.i++; renderQ(); }
+    else { go('s-send'); sendData(); }
+  }, 190);
+}
+
+function prevQ(){ if(state.i>0){ state.i--; renderQ(); } }
+
+/* ====== 전송 ====== */
+function sendData(){
+  go('s-send');
+  const payload = {
+    name: state.info.name, phone: state.info.phone,
+    age: state.info.age, sex: state.info.sex,
+    answers: ITEMS.map((it,idx)=>({ n: it.n, code: it.code, raw: state.answers[idx] }))
+  };
+  fetch(GAS_URL, {
+    method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  })
+  .then(()=>setTimeout(()=>go('s-done'), 900))
+  .catch(()=>go('s-fail'));
+}
+
+go('s-hello');
+</script>
+</body>
+</html>
